@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.kiworkshop.blind.comment.controller.dto.CommentRequest;
 import org.kiworkshop.blind.comment.controller.dto.CommentResponse;
+import org.kiworkshop.blind.comment.domain.Comment;
 import org.kiworkshop.blind.post.controller.PostRequestDto;
 import org.kiworkshop.blind.post.domain.Post;
 import org.kiworkshop.blind.post.service.PostService;
@@ -224,5 +225,18 @@ class CommentServiceTest {
         Long postId = postService.createPost(httpSession, postRequestDto);
         Post post = postService.findById(postId);
         return post;
+    }
+
+    @Test
+    void getTopFiveCommentsTest(Long postId) {
+        //given
+
+
+
+        //when
+        int commentSize = commentService.getTopFiveComments(1).size();
+
+        assertThat(commentSize).isEqualTo(5);
+        }
     }
 }
