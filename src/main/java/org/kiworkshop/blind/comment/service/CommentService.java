@@ -8,10 +8,12 @@ import org.kiworkshop.blind.comment.repository.CommentRepository;
 import org.kiworkshop.blind.comment.util.NameTagExtractor;
 import org.kiworkshop.blind.post.domain.Post;
 import org.kiworkshop.blind.user.domain.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,5 +90,13 @@ public class CommentService {
                 .createdAt(comment.getCreatedAt())
                 .lastUpdatedAt(comment.getLastUpdatedAt())
                 .build();
+    }
+
+    public List<Comment> getTopNComments(Post post, int commentSize) {
+        return commentRepository.findAllByPostOrderById(post, PageRequest.of(0, commentSize));
+    }
+
+    public List<Comment> getAfterIdComments(Post post, Long id) {
+        return commentRepository.findAllByPostAndIdGreaterThan(post, id);
     }
 }

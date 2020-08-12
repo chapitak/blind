@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -228,15 +230,62 @@ class CommentServiceTest {
     }
 
     @Test
-    void getTopFiveCommentsTest(Long postId) {
+    void getTopNCommentsTest() {
         //given
+        // 댓글 9개쯤 달자
+        //given
+        String userEmail = "naruto1@leaf.town";
+        String userPassword = "password";
+        String userName = "naruto1";
 
+        String postContent = "글입니다";
+        String postTitle = "제목입니다";
 
+        CommentRequest commentRequest = CommentRequest.builder()
+                .content("댓글 내용입니다")
+                .build();
 
         //when
-        int commentSize = commentService.getTopFiveComments(1).size();
-
-        assertThat(commentSize).isEqualTo(5);
+        createUser(userEmail, userPassword, userName);
+        login(userEmail, userPassword);
+        Post post = createPost(postContent, postTitle);
+        for (int i = 0; i < 9; i++) {
+            CommentResponse commentResponse = commentService.create(httpSession, post, commentRequest);
         }
+        List<Comment> comments = commentService.getTopNComments(post, 5);
+        //then
+        assertThat(comments.size()).isEqualTo(5);
+    }
+
+    @Test
+    void getAfterIndexCommentsTest() {
+        //given
+        // 댓글 9개쯤 달자
+        //given
+        String userEmail = "naruto1@leaf.town";
+        String userPassword = "password";
+        String userName = "naruto1";
+
+        String postContent = "글입니다";
+        String postTitle = "제목입니다";
+
+        CommentRequest commentRequest = CommentRequest.builder()
+                .content("댓글 내용입니다")
+                .build();
+
+        //when
+        createUser(userEmail, userPassword, userName);
+        login(userEmail, userPassword);
+        Post post = createPost(postContent, postTitle);
+        Post post2 = createPost(postContent, postTitle);
+        for (int i = 0; i < 9; i++) {
+             commentService.create(httpSession, post, commentRequest);
+             commentService.create(httpSession, post2, commentRequest);
+        }
+
+        //then
+        List<Comment> comments = commentService.getTopNComments(post, 5);
+        int commentSize = commentService.getAfterIdComments(post, comments.get(comments.size() - 1).getId()).size();
+        assertThat(commentSize).isEqualTo(4);
     }
 }
